@@ -69,7 +69,7 @@ App {
                     anchors.fill: parent
                     extent: usExtent
                     focus: true
-                    anchors.centerIn: app
+                    anchors.centerIn: parent
 
                     positionDisplay {
                         positionSource: PositionSource {
@@ -175,9 +175,6 @@ App {
 
                         }
 
-
-
-
                     }
 
                     Rectangle{
@@ -240,8 +237,6 @@ App {
                                 updateVisibility(2,checked);
 
                             }
-
-
                         }
 
                         Button{
@@ -283,9 +278,7 @@ App {
 
                         }
 
-
                     }
-
 
                     MouseArea{
                         id: infoRecArea
@@ -374,7 +367,7 @@ App {
                         color: "lightgrey"
                         width : mainMap.width
                         height: mainMap.height
-                        anchors.fill: parent
+                        anchors.fill: app
 
                         ListView {
                             model: fieldsModel
@@ -394,8 +387,6 @@ App {
                                 margins: 10 * scaleFactor
                                 horizontalCenter: parent.horizontalCenter
                                 bottom: fieldsView.bottom
-
-
                             }
                             text: "OK"
                             style: ButtonStyle {
@@ -435,7 +426,6 @@ App {
 
 
                 }
-
 
                 IdentifyTask {
                     id: identifyTask
@@ -478,14 +468,11 @@ App {
                             progressBar.visible = false;
                         }
                     }
-                }
+                }//IdentifyTask
 
+            }//ContentBlock
 
-            }
-
-
-
-        }
+        }//GridLayout
 
 
     }
@@ -510,7 +497,7 @@ App {
                                       }
                                         anchors{
                                             top: parent.top
-                                            topMargin: "+margin+"
+                                            topMargin: "+margin * i+"
 
                                             left: parent.left
                                             leftMargin: 10* "+scaleFactor+"
@@ -547,11 +534,11 @@ App {
                                 }
 
                  }";
-                 margin += 40;
+
                  Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
 
 
-            }
+            }//forloop
 
     }
 
