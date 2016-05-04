@@ -188,7 +188,8 @@ App {
                         border.width: 2
                         visible: false
                         onVisibleChanged: {
-                            createCheckBoxes();
+                            if(mapServiceRec.visible === true)
+                                createCheckBoxes();
                         }
                         CheckBox {
                             id: avverkningCheck
@@ -282,9 +283,7 @@ App {
 
                         }
 
-                       Component.onCompleted: {
-                         console.log(getAmountOfLayers());
-                       }
+
                     }
 
 
@@ -342,6 +341,7 @@ App {
 
                 // Progress bar
                 Row {
+
                     anchors {
                         horizontalCenter: parent.horizontalCenter
                         bottom: mainMap.bottom
@@ -374,7 +374,7 @@ App {
                         color: "lightgrey"
                         width : mainMap.width
                         height: mainMap.height
-                        anchors.fill: mainMap
+                        anchors.fill: parent
 
                         ListView {
                             model: fieldsModel
@@ -490,76 +490,73 @@ App {
 
     }
 
-    function getAmountOfLayers(){
 
-        return appVisaSkogkulturnaturhansyn_2_0_Map.layers.length;
-    }
 
     function createCheckBoxes(){
         for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers){
-            for(var j in appVisaSkogkulturnaturhansyn_2_0_Map.layers[i].subLayerIds){
-                if(i !== appVisaSkogkulturnaturhansyn_2_0_Map.layers[i].subLayerIds[j]){
-                    var checkBoxDef = "import QtQuick 2.0
-                                       import QtQuick.Controls 1.2
-                                       import QtQuick.Controls.Styles 1.4
-                                           CheckBox{
-                                              id: appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name;
-                                              checked: true;
-                                              Text{
-                                                text: '<b>' + appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name + '<b>'
-                                                font.pointSize: 15
-                                                anchors{
-                                                    horizontalCenter: mapServiceRec.horizontalCenter
-                                                    verticalCenter: mapServiceRec.verticalCenter
-                                                }
-                                             }
+            var margin = 40;
+            var checkBoxDef = "import QtQuick 2.4
+                               import QtQuick.Controls 1.2
+                               import QtQuick.Controls.Styles 1.4
+                                   CheckBox{
+                                      checked: true;
+                                      Text{
+                                        text: '<b>' + appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name + '<b>'
+                                        font.pointSize: 15
                                         anchors{
+                                            left: parent.right
                                             verticalCenter: parent.verticalCenter
+                                        }
+                                      }
+                                        anchors{
+                                            top: parent.top
+                                            topMargin: "+margin+"
 
                                             left: parent.left
-                                            leftMargin: 10* scaleFactor
+                                            leftMargin: 10* "+scaleFactor+"
+
+                                      }
+
+                                style: CheckBoxStyle {
+                                    indicator: Rectangle {
+                                        implicitWidth: 40
+                                        implicitHeight: 40
+                                        radius: 3
+                                        border.color: control.activeFocus ? 'darkblue' : 'gray'
+                                        border.width: 1
+
+                                        Rectangle{
+                                            visible: control.checked
+                                            color: '#C0C0C0'
+                                            border.color: '#333'
+                                            radius: 1
+                                            anchors.margins: 4
+                                            anchors.fill: parent
+
 
                                         }
+                                    }
 
-                                        style: CheckBoxStyle {
-                                            indicator: Rectangle {
-                                                implicitWidth: Screen.width/12
-                                                implicitHeight: Screen.height/16
-                                                radius: 3
-                                                border.color: control.activeFocus ? 'darkblue' : 'gray'
-                                                border.width: 1
+                                }
+                                onCheckedChanged: {
+                                    updateVisibility("+i+",checked);
+                                    for(var ix = 0; ix <= appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds.length; ix++){
+                                        var layerIds = appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds[ix];
+                                        updateVisibility(layerIds,checked);
+                                    }
+                                }
 
-                                                Rectangle{
-                                                    visible: control.checked
-                                                    color: '#C0C0C0'
-                                                    border.color: '#333'
-                                                    radius: 1
-                                                    anchors.margins: 4
-                                                    anchors.fill: parent
+                 }";
+                 margin += 40;
+                 Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
 
 
-                                                }
-                                            }
-
-                                        }
-                                        onCheckedChanged: {
-                                            updateVisibility("+i+",checked);
-                                            for(var ix = 0; ix <= appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds.length; ix++){
-                                                var layerIds = appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds[ix];
-                                                updateVisibility(layerIds,checked);
-                                            }
-                                        }
-
-                         }";
-                    Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
-                }
             }
-        }
 
     }
 
     function updateVisibility(layerIndex, visible) {
-        console.log("sublayer:" + appVisaSkogkulturnaturhansyn_2_0_Map.layers[0].subLayerIds);
+        console.log("sublayer:" + appVisaSkogkulturnaturhansyn_2_0_Map.layers[0].parentId);
         appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(layerIndex).visible = visible;
         appVisaSkogkulturnaturhansyn_2_0_Map.refresh();
 
