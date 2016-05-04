@@ -176,110 +176,65 @@ App {
                         }
 
                     }
+                    Flickable{
+                        id: flick
+                        width: Screen.width
+                        height: Screen.height
+                        contentHeight: Screen.height*1.5
+                        contentWidth: Screen.width
 
-                    Rectangle{
-                        id: mapServiceRec
-                        anchors.fill: mainMap
-                        color: "white"
-                        border.color: "gray"
-                        border.width: 2
-                        visible: false
-                        onVisibleChanged: {
-                            if(mapServiceRec.visible === true)
-                                createCheckBoxes();
-                        }
-                        CheckBox {
-                            id: avverkningCheck
-                            checked: true
+                        Rectangle{
+                            id: mapServiceRec
+                            anchors.fill: parent
+                            color: "white"
+                            border.color: "black"
+                            border.width: 2
+                            visible: false
+                            onVisibleChanged: {
+                                if(mapServiceRec.visible === true)
+                                    createCheckBoxes();
+                            }
 
-                            Text{
-                                text: "<b>Avverkning<b>"
-                                font.pointSize: 18
+
+                            Button{
+                                id: okButton
+                                text: "Spara"
+
                                 anchors{
-                                    horizontalCenter: parent.horizontalCenter
-                                    verticalCenter: parent.verticalCenter
+                                    right: mapServiceRec.right
                                 }
-                            }
-                            anchors{
-                                verticalCenter: parent.verticalCenter
 
-                                left: parent.left
-                                leftMargin: 10* scaleFactor
-
-
-                            }
-                            style: CheckBoxStyle {
-                                indicator: Rectangle {
-                                    implicitWidth: Screen.width/12
-                                    implicitHeight: Screen.height/16
-                                    radius: 3
-                                    border.color: control.activeFocus ? "darkblue" : "gray"
-                                    border.width: 1
-
-                                    Rectangle{
-                                        visible: control.checked
-                                        color: "#C0C0C0"
-                                        border.color: "#333"
-                                        radius: 1
-                                        anchors.margins: 4
-                                        anchors.fill: parent
+                                style: ButtonStyle {
+                                    background:Rectangle {
+                                        implicitWidth: Text.Wrap
+                                        implicitHeight: Text.Wrap
+                                        border.width: control.activeFocus ? 2 : 1
+                                        border.color: "#888"
+                                        radius: 2
+                                        gradient: Gradient {
+                                            GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
+                                            GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
+                                        }
+                                    }
+                                    label: Text {
+                                        text: "<b><i>" + control.text + "</b></i>"
+                                        color:"#3a3a3a"
 
 
+                                        font.pointSize: 20
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignVCenter
                                     }
                                 }
-
-                            }
-
-                            onCheckedChanged: {
-                                console.log(appVisaSkogkulturnaturhansyn_2_0_Map.layers.length);
-                                updateVisibility(1,checked);
-                                updateVisibility(0, checked);
-                                updateVisibility(2,checked);
-
-                            }
-                        }
-
-                        Button{
-                            id: okButton
-                            text: "Spara"
-
-                            anchors{
-                                horizontalCenter: parent.horizontalCenter
-                                margins: 10 * scaleFactor
-                                bottom: mapServiceRec.bottom
-
-                            }
-                            style: ButtonStyle {
-                                background:Rectangle {
-                                    implicitWidth: Text.Wrap
-                                    implicitHeight: Text.Wrap
-                                    border.width: control.activeFocus ? 2 : 1
-                                    border.color: "#888"
-                                    radius: 2
-                                    gradient: Gradient {
-                                        GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
-                                        GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
-                                    }
+                                onClicked: {
+                                    mapServiceRec.visible = false;
                                 }
-                                label: Text {
-                                    text: "<b><i>" + control.text + "</b></i>"
-                                    color:"#3a3a3a"
 
 
-                                    font.pointSize: 20
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-                                }
                             }
-                            onClicked: {
-                                mapServiceRec.visible = false;
-                            }
-
 
                         }
-
                     }
-
                     MouseArea{
                         id: infoRecArea
                         anchors.fill: feedbackRectangle
@@ -481,7 +436,7 @@ App {
 
     function createCheckBoxes(){
         for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers){
-            var margin = 40;
+            var margin = 50;
             var checkBoxDef = "import QtQuick 2.4
                                import QtQuick.Controls 1.2
                                import QtQuick.Controls.Styles 1.4
@@ -500,7 +455,7 @@ App {
                                             topMargin: "+margin * i+"
 
                                             left: parent.left
-                                            leftMargin: 10* "+scaleFactor+"
+                                            leftMargin: 10
 
                                       }
 
@@ -527,10 +482,7 @@ App {
                                 }
                                 onCheckedChanged: {
                                     updateVisibility("+i+",checked);
-                                    for(var ix = 0; ix <= appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds.length; ix++){
-                                        var layerIds = appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds[ix];
-                                        updateVisibility(layerIds,checked);
-                                    }
+
                                 }
 
                  }";
