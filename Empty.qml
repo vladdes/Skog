@@ -1,4 +1,5 @@
 //------------------------------------------------------------------------------
+//Author: vladimir.strukelj@guest.skogsstyrelsen.se
 
 import QtQuick 2.4
 import QtQuick.Controls 1.2
@@ -186,7 +187,9 @@ App {
                         border.color: "gray"
                         border.width: 2
                         visible: false
-
+                        onVisibleChanged: {
+                            createCheckBoxes();
+                        }
                         CheckBox {
                             id: avverkningCheck
                             checked: true
@@ -228,7 +231,9 @@ App {
                                 }
 
                             }
+
                             onCheckedChanged: {
+                                console.log(appVisaSkogkulturnaturhansyn_2_0_Map.layers.length);
                                 updateVisibility(1,checked);
                                 updateVisibility(0, checked);
                                 updateVisibility(2,checked);
@@ -278,7 +283,7 @@ App {
                         }
 
                        Component.onCompleted: {
-                         console.log(appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(0).name);
+                         console.log(getAmountOfLayers());
                        }
                     }
 
@@ -483,6 +488,11 @@ App {
         }
 
 
+    }
+
+    function getAmountOfLayers(){
+
+        return appVisaSkogkulturnaturhansyn_2_0_Map.layers.length;
     }
 
     function createCheckBoxes(){
