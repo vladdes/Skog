@@ -175,7 +175,7 @@ App {
                         }
 
 
-                    //hey
+
 
                     }
 
@@ -485,60 +485,62 @@ App {
 
     }
 
-    function createCheckBoxesGodDamnit(){
+    function createCheckBoxes(){
         for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers){
             for(var j in appVisaSkogkulturnaturhansyn_2_0_Map.layers[i].subLayerIds){
                 if(i !== appVisaSkogkulturnaturhansyn_2_0_Map.layers[i].subLayerIds[j]){
-                    var checkBoxDef = "import QtQuick 2.0;
-                                      CheckBox{
-                                          id: appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name;
-                                          checked: true;
-                                          Text{
-                                            text: '<b>' + appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name + '<b>'
-                                            font.pointSize: 15
-                                            anchors{
-                                                horizontalCenter: mapServiceRec.horizontalCenter
-                                                verticalCenter: mapServiceRec.verticalCenter
+                    var checkBoxDef = "import QtQuick 2.0
+                                       import QtQuick.Controls 1.2
+                                       import QtQuick.Controls.Styles 1.4
+                                           CheckBox{
+                                              id: appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name;
+                                              checked: true;
+                                              Text{
+                                                text: '<b>' + appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name + '<b>'
+                                                font.pointSize: 15
+                                                anchors{
+                                                    horizontalCenter: mapServiceRec.horizontalCenter
+                                                    verticalCenter: mapServiceRec.verticalCenter
+                                                }
+                                             }
+                                        anchors{
+                                            verticalCenter: parent.verticalCenter
+
+                                            left: parent.left
+                                            leftMargin: 10* scaleFactor
+
+                                        }
+
+                                        style: CheckBoxStyle {
+                                            indicator: Rectangle {
+                                                implicitWidth: Screen.width/12
+                                                implicitHeight: Screen.height/16
+                                                radius: 3
+                                                border.color: control.activeFocus ? 'darkblue' : 'gray'
+                                                border.width: 1
+
+                                                Rectangle{
+                                                    visible: control.checked
+                                                    color: '#C0C0C0'
+                                                    border.color: '#333'
+                                                    radius: 1
+                                                    anchors.margins: 4
+                                                    anchors.fill: parent
+
+
+                                                }
                                             }
-                                         }
-                                    anchors{
-                                        verticalCenter: parent.verticalCenter
 
-                                        left: parent.left
-                                        leftMargin: 10* scaleFactor
-
-                                    }
-
-                                    style: CheckBoxStyle {
-                                        indicator: Rectangle {
-                                            implicitWidth: Screen.width/12
-                                            implicitHeight: Screen.height/16
-                                            radius: 3
-                                            border.color: control.activeFocus ? 'darkblue' : 'gray'
-                                            border.width: 1
-
-                                            Rectangle{
-                                                visible: control.checked
-                                                color: '#C0C0C0'
-                                                border.color: '#333'
-                                                radius: 1
-                                                anchors.margins: 4
-                                                anchors.fill: parent
-
-
+                                        }
+                                        onCheckedChanged: {
+                                            updateVisibility("+i+",checked);
+                                            for(var ix = 0; ix <= appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds.length; ix++){
+                                                var layerIds = appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds[ix];
+                                                updateVisibility(layerIds,checked);
                                             }
                                         }
 
-                                    }
-                                    onCheckedChanged: {
-                                        updateVisibility("+i+",checked);
-                                        for(var ix = 0; ix <= in appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds.length; ix++){
-                                            var layerIds = appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].subLayerIds[ix];
-                                            updateVisibility(layerIds,checked);
-                                        }
-                                    }
-
-                     }";
+                         }";
                     Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
                 }
             }
