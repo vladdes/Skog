@@ -34,19 +34,19 @@ App {
         anchors.margins: 5 * displayScaleFactor;
 
 
-        ToolBar {
-            id: toolbar
-            Layout.fillWidth: true
+//        ToolBar {
+//            id: toolbar
+//            Layout.fillWidth: true
 
-            RowLayout {
-                ToolButton {
-                    id: errorButton
-                    text: ""
-                    onClicked: errorButton.text = ""
+//            RowLayout {
+//                ToolButton {
+//                    id: errorButton
+//                    text: ""
+//                    onClicked: errorButton.text = ""
 
-                }
-            }
-        }
+//                }
+//            }
+//        }
 
         GridLayout {
             id: grid
@@ -177,11 +177,12 @@ App {
 
                     }
                     Flickable{
-                        id: flick
+                        id: flickServices
                         width: Screen.width
                         height: Screen.height
-                        contentHeight: Screen.height*1.5
+                        contentHeight: Screen.height*2
                         contentWidth: Screen.width
+
 
                         Rectangle{
                             id: mapServiceRec
@@ -190,56 +191,63 @@ App {
                             border.color: "black"
                             border.width: 2
                             visible: false
+
                             onVisibleChanged: {
                                 if(mapServiceRec.visible === true)
                                     createCheckBoxes();
                             }
 
 
-                            Button{
-                                id: okButton
-                                text: "Spara"
 
-                                anchors{
-                                    right: mapServiceRec.right
-                                }
-
-                                style: ButtonStyle {
-                                    background:Rectangle {
-                                        implicitWidth: Text.Wrap
-                                        implicitHeight: Text.Wrap
-                                        border.width: control.activeFocus ? 2 : 1
-                                        border.color: "#888"
-                                        radius: 2
-                                        gradient: Gradient {
-                                            GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
-                                            GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
-                                        }
-                                    }
-                                    label: Text {
-                                        text: "<b><i>" + control.text + "</b></i>"
-                                        color:"#3a3a3a"
-
-
-                                        font.pointSize: 20
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-                                }
-                                onClicked: {
-                                    mapServiceRec.visible = false;
-                                }
-
-
-                            }
 
                         }
+
+                    }
+
+                    Button{
+                        id: okButton
+                        text: "Spara"
+                        visible: false
+                        anchors{
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+
+                        }
+
+                        style: ButtonStyle {
+                            background:Rectangle {
+                                implicitWidth: 100
+                                implicitHeight: 100
+                                border.width: control.activeFocus ? 2 : 1
+                                border.color: "#888"
+                                radius: 2
+                                gradient: Gradient {
+                                    GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
+                                    GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
+                                }
+                            }
+                            label: Text {
+                                text: "<b><i>" + control.text + "</b></i>"
+                                color:"#3a3a3a"
+
+
+                                font.pointSize: 20
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+                        onClicked: {
+                            mapServiceRec.visible = false;
+                            okButton.visible = false;
+                        }
+
+
                     }
                     MouseArea{
                         id: infoRecArea
                         anchors.fill: feedbackRectangle
                         hoverEnabled: true
-                        onClicked: mapServiceRec.visible = true
+                        onClicked:{ mapServiceRec.visible = true; okButton.visible = true}
 
                     }
 
@@ -396,7 +404,7 @@ App {
 
                                 var result = identifyResult[index];
                                 for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers)
-                                    console.log("sublayer:" + appVisaSkogkulturnaturhansyn_2_0_Map.layers[i].subLayerIds);
+
 
                                 if(appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(index).visible === true){
                                     for(var attributeIndex in result.feature.attributeNames){
@@ -433,7 +441,7 @@ App {
     }
 
 
-
+     //Creates a new checkbox for each layer.
     function createCheckBoxes(){
         for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers){
             var margin = 50;
@@ -452,7 +460,7 @@ App {
                                       }
                                         anchors{
                                             top: parent.top
-                                            topMargin: "+margin * i+"
+                                            topMargin: "+ (margin + (margin * i))+"
 
                                             left: parent.left
                                             leftMargin: 10
@@ -495,7 +503,7 @@ App {
     }
 
     function updateVisibility(layerIndex, visible) {
-        console.log("sublayer:" + appVisaSkogkulturnaturhansyn_2_0_Map.layers[0].parentId);
+
         appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(layerIndex).visible = visible;
         appVisaSkogkulturnaturhansyn_2_0_Map.refresh();
 
