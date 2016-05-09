@@ -34,19 +34,19 @@ App {
         anchors.margins: 5 * displayScaleFactor;
 
 
-//        ToolBar {
-//            id: toolbar
-//            Layout.fillWidth: true
+        //        ToolBar {
+        //            id: toolbar
+        //            Layout.fillWidth: true
 
-//            RowLayout {
-//                ToolButton {
-//                    id: errorButton
-//                    text: ""
-//                    onClicked: errorButton.text = ""
+        //            RowLayout {
+        //                ToolButton {
+        //                    id: errorButton
+        //                    text: ""
+        //                    onClicked: errorButton.text = ""
 
-//                }
-//            }
-//        }
+        //                }
+        //            }
+        //        }
 
         GridLayout {
             id: grid
@@ -176,12 +176,14 @@ App {
                         }
 
                     }
+
                     Flickable{
                         id: flickServices
                         width: Screen.width
                         height: Screen.height
                         contentHeight: Screen.height*2
                         contentWidth: Screen.width
+                        visible: false
 
 
                         Rectangle{
@@ -195,6 +197,12 @@ App {
                             onVisibleChanged: {
                                 if(mapServiceRec.visible === true)
                                     createCheckBoxes();
+                                else{
+                                    for(var i in mapServiceRec.children){
+                                        mapServiceRec.children[i].destroy();
+                                    }
+
+                                }
                             }
 
 
@@ -203,7 +211,6 @@ App {
                         }
 
                     }
-
                     Button{
                         id: okButton
                         text: "Spara"
@@ -238,6 +245,7 @@ App {
                         }
                         onClicked: {
                             mapServiceRec.visible = false;
+                            flickServices.visible = false;
                             okButton.visible = false;
                         }
 
@@ -247,7 +255,7 @@ App {
                         id: infoRecArea
                         anchors.fill: feedbackRectangle
                         hoverEnabled: true
-                        onClicked:{ mapServiceRec.visible = true; okButton.visible = true}
+                        onClicked:{ mapServiceRec.visible = true; okButton.visible = true; flickServices.visible = true}
 
                     }
 
@@ -319,6 +327,7 @@ App {
                         width: 0.5 * scaleFactor
                         color: "black"
                     }
+
                 }
 
                 // Responsewindow for results
@@ -405,15 +414,19 @@ App {
                                 var result = identifyResult[index];
                                 for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers)
 
+                                    var attributeNameDisplayed;
+                                    if(appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(index).visible === true ){
+                                        for(var attributeIndex in result.feature.attributeNames){
+                                            var attributeName = result.feature.attributeNames[attributeIndex];
 
-                                if(appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(index).visible === true){
-                                    for(var attributeIndex in result.feature.attributeNames){
-                                        var attributeName = result.feature.attributeNames[attributeIndex];
-                                        var attributeValue = result.feature.attributeValue(attributeName);
-                                        fieldsModel.append({"name": attributeName, "value" : attributeValue});
+                                            var attributeValue = result.feature.attributeValue(attributeName);
+                                            if(attributeName !== attributeNameDisplayed){
+                                                fieldsModel.append({"name": attributeName, "value" : attributeValue});
+                                                attributeNameDisplayed = attributeName;
+                                            }
 
+                                        }
                                     }
-                                }
 
                             }
                             if (fieldsModel.count === 0)
@@ -435,13 +448,14 @@ App {
 
             }//ContentBlock
 
+
         }//GridLayout
 
 
     }
 
 
-     //Creates a new checkbox for each layer.
+    //Creates a new checkbox for each layer.
     function createCheckBoxes(){
         for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers){
             var margin = 50;
@@ -449,7 +463,7 @@ App {
                                import QtQuick.Controls 1.2
                                import QtQuick.Controls.Styles 1.4
                                    CheckBox{
-                                      checked: true;
+                                      checked: appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].visible ? true : false;
                                       Text{
                                         text: '<b>' + appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name + '<b>'
                                         font.pointSize: 15
@@ -461,12 +475,9 @@ App {
                                         anchors{
                                             top: parent.top
                                             topMargin: "+ (margin + (margin * i))+"
-
                                             left: parent.left
                                             leftMargin: 10
-
                                       }
-
                                 style: CheckBoxStyle {
                                     indicator: Rectangle {
                                         implicitWidth: 40
@@ -474,7 +485,6 @@ App {
                                         radius: 3
                                         border.color: control.activeFocus ? 'darkblue' : 'gray'
                                         border.width: 1
-
                                         Rectangle{
                                             visible: control.checked
                                             color: '#C0C0C0'
@@ -482,23 +492,21 @@ App {
                                             radius: 1
                                             anchors.margins: 4
                                             anchors.fill: parent
-
-
                                         }
                                     }
-
                                 }
                                 onCheckedChanged: {
                                     updateVisibility("+i+",checked);
-
                                 }
+
+
 
                  }";
 
-                 Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
+            Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
 
 
-            }//forloop
+        }//forloop
 
     }
 
@@ -511,5 +519,3 @@ App {
 
 
 }
-
-
