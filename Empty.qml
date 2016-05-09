@@ -189,7 +189,7 @@ App {
                         Rectangle{
                             id: mapServiceRec
                             anchors.fill: parent
-                            color: "white"
+                            color: "#6DDC74"
                             border.color: "black"
                             border.width: 2
                             visible: false
@@ -216,21 +216,22 @@ App {
                         text: "Spara"
                         visible: false
                         anchors{
-                            right: parent.right
-                            verticalCenter: parent.verticalCenter
+                            margins: 10 * scaleFactor
+                            horizontalCenter: parent.horizontalCenter
+                            bottom: parent.bottom
 
                         }
 
                         style: ButtonStyle {
                             background:Rectangle {
-                                implicitWidth: 100
+                                implicitWidth: 150
                                 implicitHeight: 100
                                 border.width: control.activeFocus ? 2 : 1
                                 border.color: "#888"
                                 radius: 2
                                 gradient: Gradient {
-                                    GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
-                                    GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
+                                    GradientStop { position: 0 ; color: control.pressed ? "#005B00" : "#6DDC74" }
+                                    GradientStop { position: 1 ; color: control.pressed ? "#005B00" : "#005B00" }
                                 }
                             }
                             label: Text {
@@ -238,7 +239,7 @@ App {
                                 color:"#3a3a3a"
 
 
-                                font.pointSize: 20
+                                font.pointSize: okButton.height/3
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
                             }
@@ -336,7 +337,7 @@ App {
                     visible: false
                     Rectangle {
                         id: dialogRectangle
-                        color: "lightgrey"
+                        color: "#6DDC74"
                         width : mainMap.width
                         height: mainMap.height
                         anchors.fill: app
@@ -351,6 +352,11 @@ App {
                             clip: true
                             delegate: Text {
                                 text: name + ": " + value
+                                color: "#00572E"
+                                font.pointSize: 14
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                font.bold: true
+
                             }
                         }
                         Button {
@@ -360,24 +366,24 @@ App {
                                 horizontalCenter: parent.horizontalCenter
                                 bottom: fieldsView.bottom
                             }
-                            text: "OK"
+                            text: "<b>OK</b>"
                             style: ButtonStyle {
                                 background:Rectangle {
-                                    implicitWidth: identifyDialog.width/ 2
-                                    implicitHeight: identifyDialog.height / 6
+                                    implicitWidth: 150
+                                    implicitHeight: 100
                                     border.width: control.activeFocus ? 2 : 1
                                     border.color: "#888"
                                     radius: 4
                                     gradient: Gradient {
-                                        GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
-                                        GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
+                                        GradientStop { position: 0 ; color: control.pressed ? "#005B00" : "#eee" }
+                                        GradientStop { position: 1 ; color: control.pressed ? "#000000" : "#005B00" }
                                     }
                                 }
                                 label: Text {
                                     text: control.text
                                     color:"#3a3a3a"
 
-                                    font.pixelSize: infoButton.height /2
+                                    font.pixelSize: infoButton.height /3
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -420,7 +426,7 @@ App {
                                             var attributeName = result.feature.attributeNames[attributeIndex];
 
                                             var attributeValue = result.feature.attributeValue(attributeName);
-                                            if(attributeName !== attributeNameDisplayed){
+                                            if(attributeName !== attributeNameDisplayed && attributeName !== "shape"){
                                                 fieldsModel.append({"name": attributeName, "value" : attributeValue});
                                                 attributeNameDisplayed = attributeName;
                                             }
@@ -487,7 +493,7 @@ App {
                                         border.width: 1
                                         Rectangle{
                                             visible: control.checked
-                                            color: '#C0C0C0'
+                                            color: '#00572E'
                                             border.color: '#333'
                                             radius: 1
                                             anchors.margins: 4
