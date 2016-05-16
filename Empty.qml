@@ -9,6 +9,7 @@ import QtQuick.Window 2.0
 import QtPositioning 5.3
 import QtQuick.Layouts 1.1
 
+
 import ArcGIS.AppFramework 1.0
 import ArcGIS.AppFramework.Controls 1.0
 import ArcGIS.AppFramework.Runtime 1.0
@@ -27,26 +28,13 @@ App {
     property bool isLandscape : width > height
     property double scaleFactor: AppFramework.displayScaleFactor
     property string appVisaSkogkulturnaturhansyn_2_0: "http://gedpagstest.skogsstyrelsen.se/arcgis/rest/services/App/AppVisaSkogkulturnaturhansyn_2_0/MapServer"
-
+    property var checkBoxes: []
+    property string skogsTiledMapService: "https://geodata.skogsstyrelsen.se/arcgis/rest/services/SkogligaGrunddata/ImageServer"
+    property string esriTiledMapServer: "http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer"
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 5 * displayScaleFactor;
-
-
-        //        ToolBar {
-        //            id: toolbar
-        //            Layout.fillWidth: true
-
-        //            RowLayout {
-        //                ToolButton {
-        //                    id: errorButton
-        //                    text: ""
-        //                    onClicked: errorButton.text = ""
-
-        //                }
-        //            }
-        //        }
 
         GridLayout {
             id: grid
@@ -63,6 +51,7 @@ App {
             //            }
 
             ContentBlock {
+
 
                 Map {
                     id: mainMap
@@ -84,23 +73,27 @@ App {
                             margins: 30
                         }
                     }
-
                     ArcGISTiledMapServiceLayer {
+                        id: baseMap
                         url: "http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
-
-
+                        name: "Esris baskarta."
+                        visible: true
 
                     }
-
-
+                    ArcGISImageServiceLayer{
+                        id: skogsMapComponent
+                        name: "Skogstyrelsens baskarta."
+                        url: skogsTiledMapService
+                        visible: false
+                    }
 
                     ArcGISDynamicMapServiceLayer {
                         url: appVisaSkogkulturnaturhansyn_2_0
                         id: appVisaSkogkulturnaturhansyn_2_0_Map
+
                         visible: true
-
-
                     }
+
 
 
                     // Starting map extent
@@ -154,6 +147,139 @@ App {
                         identifyTask.execute(identifyParameters);
 
                     }
+                    Rectangle {
+                        anchors {
+                            fill: controlsColumn
+                            margins: -10
+                        }
+                        color: "lightgrey"
+                        radius: 5
+                        border.color: "black"
+                        opacity: 0.77
+                    }
+
+                    Column {
+                        id: controlsColumn
+                        anchors {
+                            left: parent.left
+                            top: parent.top
+                            margins: 20 * scaleFactor
+                        }
+                        spacing: 10 * scaleFactor
+
+                        Button {
+                            id: loadButton
+                            text: "Välj karta"
+                            style: okButton.style
+                            opacity: loadButton.hovered ? 1 : 0.5
+
+                            onClicked: {
+                                loadBack.visible = true
+                                loadLayerColumn.visible = true
+                            }
+                        }
+
+
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        id: overlay
+                        color: "#000000"
+                        opacity: 0.6
+
+                        MouseArea {
+                            anchors.fill: parent
+                        }
+
+                        visible: loadLayerColumn.visible
+
+                        Rectangle {
+                            id: loadBack
+                            anchors {
+                                horizontalCenter: parent.horizontalCenter
+                                verticalCenter: parent.verticalCenter
+                            }
+                            clip: true
+                            width: loadLayerColumn.width + 30 * scaleFactor
+                            height: loadLayerColumn.height + 30 * scaleFactor
+                            color: "white"
+                            radius: 5 * scaleFactor
+                            border.color: "white"
+                            visible: loadLayerColumn.visible
+                        }
+                    }
+
+                    Column {
+                        id: loadLayerColumn
+                        anchors {
+                            horizontalCenter: parent.horizontalCenter
+                            verticalCenter: parent.verticalCenter
+                        }
+                        spacing: 10 * scaleFactor
+                        visible: false
+
+                        Text {
+                            text: "Välj karta:"
+                            font.pixelSize: 14 * scaleFactor
+                        }
+
+                        ComboBox{
+                            id: choseMapComboBox
+
+
+                            width: 180 * scaleFactor
+                            height: 40 * scaleFactor
+                            style: ComboBoxStyle{
+                                label: Text {
+                                    verticalAlignment: Text.AlignVCenter
+                                    horizontalAlignment: Text.AlignHCenter
+                                    font.pointSize: 10 * scaleFactor
+                                    font.capitalization: Font.SmallCaps
+                                    color: "black"
+                                    text: control.currentText
+                                }
+
+                            }
+
+                            model: [baseMap.name, skogsMapComponent.name]
+                        }
+
+                        Row {
+                            spacing: 10 * scaleFactor
+
+                            Button {
+                                id: okButtonMap
+                                text: "Ok"
+                                style: okButton.style
+                                opacity: okButtonMap.hovered ? 1 :0.5
+                                onClicked: {
+
+                                    loadLayerColumn.visible = false;
+                                    //                                    mainMap.reset();
+
+
+                                    //                                    var tiledMapService = choseMapComboBox.currentIndex === 0 ? ArcGISRuntime.createObject("ArcGISTiledMapServiceLayer") : ArcGISRuntime.createObject("ArcGISImageServiceLayer");
+                                    //                                    tiledMapService.url = choseMapComboBox.currentIndex === 0 ? baseMap.url : skogsMapComponent.url;
+
+
+                                    skogsMapComponent.visible = choseMapComboBox.currentIndex === 0 ? false : true;
+                                    //                                    mainMap.addLayer(tiledMapService);
+
+
+                                }
+
+                            }
+
+                            Button {
+                                id: cancelMapButton
+                                text: "Cancel"
+                                style: okButton.style
+                                opacity: cancelMapButton.hovered ? 1 : 0.5
+                                onClicked: loadLayerColumn.visible = false
+                            }
+                        }
+                    }
 
                     // Dialog for instructions and error messages
                     Rectangle {
@@ -162,53 +288,81 @@ App {
                             fill: messageColumn
                             margins: -10 * scaleFactor
                         }
-                        color: "lightgrey"
+
+                        color: "#31cc3b"
                         radius: 5 * scaleFactor
-                        border.color: "black"
+                        border.color: "white"
+                        border.width: 3
                         opacity: 0.77
                         Text {
                             id: infoText
-                            text: qsTr("Klicka här för att välja karttjänst")
-
+                            text: qsTr("Klicka här för att välja karttjänst.")
+                            color: "white"
                             anchors.centerIn: feedbackRectangle
-
+                            font.pixelSize: 12 * scaleFactor
+                            font.bold: true
 
                         }
 
+
+                    }
+                    // Progress bar
+                    Row {
+
+                        anchors {
+                            horizontalCenter: parent.horizontalCenter
+                            bottom: parent.bottom
+                            bottomMargin: 5 * scaleFactor
+                        }
+
+                        ProgressBar {
+                            id: progressBar
+                            indeterminate: true
+                            visible: false
+                        }
                     }
 
                     Flickable{
                         id: flickServices
-                        width: Screen.width
-                        height: Screen.height
-                        contentHeight: Screen.height*2
-                        contentWidth: Screen.width
+                        width: parent.width
+                        height: parent.height
+                        contentHeight: parent.height*3
+                        contentWidth: parent.width
                         visible: false
 
 
                         Rectangle{
                             id: mapServiceRec
                             anchors.fill: parent
-                            color: "#6DDC74"
-                            border.color: "black"
-                            border.width: 2
+                            color: "#31cc3b"
                             visible: false
+                            Text{
+                                text: qsTr("Välj bort eller lägg till genom att knacka.")
+                                color: "white"
+                                anchors{
+                                    horizontalCenter: parent.horizontalCenter
+                                    top: parent.top
+                                    topMargin: 10* scaleFactor
+                                }
 
+                                font.pixelSize: 14 * scaleFactor
+                                font.bold: true
+
+                            }
                             onVisibleChanged: {
                                 if(mapServiceRec.visible === true)
                                     createCheckBoxes();
                                 else{
-                                    for(var i in mapServiceRec.children){
-                                        mapServiceRec.children[i].destroy();
+                                    for(var i in checkBoxes){
+                                        console.log(checkBoxes.pop(i));
+
                                     }
 
                                 }
                             }
 
+                        }//mapServiceRec
 
-
-
-                        }
 
                     }
                     Button{
@@ -224,39 +378,47 @@ App {
 
                         style: ButtonStyle {
                             background:Rectangle {
-                                implicitWidth: 150
-                                implicitHeight: 100
+                                implicitWidth: 150 * scaleFactor
+                                implicitHeight: 50 * scaleFactor
                                 border.width: control.activeFocus ? 2 : 1
                                 border.color: "#888"
-                                radius: 2
-                                gradient: Gradient {
-                                    GradientStop { position: 0 ; color: control.pressed ? "#005B00" : "#6DDC74" }
-                                    GradientStop { position: 1 ; color: control.pressed ? "#005B00" : "#005B00" }
-                                }
+                                radius: 5
+                                color: "white"
+                                opacity: okButton.hovered ? 1 : 0.5
                             }
                             label: Text {
                                 text: "<b><i>" + control.text + "</b></i>"
                                 color:"#3a3a3a"
 
-
-                                font.pointSize: okButton.height/3
+                                wrapMode: Text.WordWrap
+                                font.pixelSize: 14 *scaleFactor
                                 horizontalAlignment: Text.AlignHCenter
                                 verticalAlignment: Text.AlignVCenter
+
                             }
                         }
                         onClicked: {
                             mapServiceRec.visible = false;
                             flickServices.visible = false;
                             okButton.visible = false;
+
+
                         }
 
 
                     }
+
                     MouseArea{
                         id: infoRecArea
                         anchors.fill: feedbackRectangle
                         hoverEnabled: true
-                        onClicked:{ mapServiceRec.visible = true; okButton.visible = true; flickServices.visible = true}
+                        onClicked:{
+                            mapServiceRec.visible = true;
+                            okButton.visible = true;
+                            flickServices.visible = true;
+
+
+                        }
 
                     }
 
@@ -264,7 +426,7 @@ App {
                         id: messageColumn
                         anchors {
                             top: parent.top
-                            left: parent.left
+                            horizontalCenter: parent.horizontalCenter
                             margins: 20 * scaleFactor
                         }
                         width: 210 * scaleFactor
@@ -294,7 +456,7 @@ App {
                             Text {
                                 id: resultText
                                 text: qsTr("")
-                                font.pixelSize: 12 * scaleFactor
+                                font.pixelSize: 14 * scaleFactor
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 visible: true
@@ -304,32 +466,6 @@ App {
                     }
                 }
 
-                // Progress bar
-                Row {
-
-                    anchors {
-                        horizontalCenter: parent.horizontalCenter
-                        bottom: mainMap.bottom
-                        bottomMargin: 5 * scaleFactor
-                    }
-
-                    ProgressBar {
-                        id: progressBar
-                        indeterminate: true
-                        visible: false
-                    }
-                }
-
-                Rectangle {
-                    id: rectangleBorder
-                    anchors.fill: parent
-                    color: "transparent"
-                    border {
-                        width: 0.5 * scaleFactor
-                        color: "black"
-                    }
-
-                }
 
                 // Responsewindow for results
                 Item {
@@ -337,7 +473,7 @@ App {
                     visible: false
                     Rectangle {
                         id: dialogRectangle
-                        color: "#6DDC74"
+                        color: "#31cc3b"
                         width : mainMap.width
                         height: mainMap.height
                         anchors.fill: app
@@ -347,13 +483,19 @@ App {
                             id: fieldsView
                             //flickableData: elem
                             anchors.fill: parent
+                            anchors.bottomMargin: 80
                             contentWidth: parent.width
                             contentHeight: parent.height
                             clip: true
                             delegate: Text {
-                                text: name + ": " + value
-                                color: "#00572E"
-                                font.pointSize: 14
+                                text: {
+                                    if(name=== "error")
+                                        text = "Inget objekt hittat!";
+                                    else
+                                        text = name + ": " + value;
+                                }
+                                color: "white"
+                                font.pixelSize: 14 * scaleFactor
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 font.bold: true
 
@@ -362,28 +504,27 @@ App {
                         Button {
                             id: infoButton
                             anchors {
-                                margins: 10 * scaleFactor
+                                bottomMargin: 10 * scaleFactor
                                 horizontalCenter: parent.horizontalCenter
-                                bottom: fieldsView.bottom
+                                top: fieldsView.bottom
+
                             }
                             text: "<b>OK</b>"
                             style: ButtonStyle {
                                 background:Rectangle {
-                                    implicitWidth: 150
-                                    implicitHeight: 100
+                                    implicitWidth: 150 * scaleFactor
+                                    implicitHeight: 50 * scaleFactor
                                     border.width: control.activeFocus ? 2 : 1
                                     border.color: "#888"
-                                    radius: 4
-                                    gradient: Gradient {
-                                        GradientStop { position: 0 ; color: control.pressed ? "#005B00" : "#eee" }
-                                        GradientStop { position: 1 ; color: control.pressed ? "#000000" : "#005B00" }
-                                    }
+                                    radius: 5
+                                    color: "white"
+                                    opacity: infoButton.hovered ? 1 : 0.5
                                 }
                                 label: Text {
                                     text: control.text
                                     color:"#3a3a3a"
 
-                                    font.pixelSize: infoButton.height /3
+                                    font.pixelSize: 14 * scaleFactor
                                     horizontalAlignment: Text.AlignHCenter
                                     verticalAlignment: Text.AlignVCenter
                                 }
@@ -418,25 +559,28 @@ App {
                             for (var index in identifyResult) {
 
                                 var result = identifyResult[index];
-                                for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers)
+                                var attributeNameDisplayed;
 
-                                    var attributeNameDisplayed;
-                                    if(appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(index).visible === true ){
-                                        for(var attributeIndex in result.feature.attributeNames){
-                                            var attributeName = result.feature.attributeNames[attributeIndex];
+                                console.log("namn: "+appVisaSkogkulturnaturhansyn_2_0_Map.subLayerByName(result.layerName).name);
+                                console.log("visible: "+appVisaSkogkulturnaturhansyn_2_0_Map.subLayerByName(result.layerName).visible);
+                                var checkVisLayer = "";
 
-                                            var attributeValue = result.feature.attributeValue(attributeName);
-                                            if(attributeName !== attributeNameDisplayed && attributeName !== "shape"){
-                                                fieldsModel.append({"name": attributeName, "value" : attributeValue});
-                                                attributeNameDisplayed = attributeName;
-                                            }
-
+                                for(var attributeIndex in result.feature.attributeNames){
+                                    var attributeName = result.feature.attributeNames[attributeIndex];
+                                    if(appVisaSkogkulturnaturhansyn_2_0_Map.subLayerByName(result.layerName).visible){
+                                        var attributeValue = result.feature.attributeValue(attributeName);
+                                        if(attributeName !== attributeNameDisplayed && attributeName !== "shape"){
+                                            fieldsModel.append({"name": attributeName, "value" : attributeValue});
+                                            attributeNameDisplayed = attributeName;
                                         }
                                     }
 
+                                }
+
+
                             }
-                            if (fieldsModel.count === 0)
-                                fieldsModel.append({"name": "Results", "value": "none"});
+                            if(fieldsModel.count === 0)
+                                fieldsModel.append({"name": "error", "value": ""});
                             identifyDialog.visible = true;
                             if(Qt.platform.os !== "ios" && Qt.platform.os != "android") {
                                 identifyDialog.width = 365 * scaleFactor
@@ -452,64 +596,169 @@ App {
                     }
                 }//IdentifyTask
 
+
             }//ContentBlock
+
+            Rectangle{
+                id: loginRec
+                anchors.fill: parent
+                color: "#31cc3b"
+                visible: true
+                Image {
+                    id: loginImage
+                    source: "front.jpg"
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                }
+                Text{
+                    text:"Här finns registrerade hänsynskrävande skogsområden och kulturlämningar i svenska skogar. Dessutom kan du via GPS se din egen position i kartan på telefonen eller plattan."
+                    color: "white"
+                    anchors{
+                        top: loginImage.bottom
+                        right: parent.right
+                        left: parent.left
+                        margins:  15* scaleFactor
+                    }
+                    wrapMode: Text.Wrap
+                    font.pixelSize: 20 * scaleFactor
+                    font.bold: true
+
+                }
+                Row {
+
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                        bottom: parent.bottom
+                        bottomMargin: 5 * scaleFactor
+                    }
+
+                    ProgressBar {
+                        id: loginBar
+                        indeterminate: true
+                        visible: false
+                    }
+                }
+                Button {
+                    id: loginButton
+                    anchors {
+                        bottomMargin: 40 * scaleFactor
+                        horizontalCenter: loginRec.horizontalCenter
+                        bottom: loginRec.bottom
+                    }
+                    text: "<b>OK</b>"
+                    style: ButtonStyle {
+                        background:Rectangle {
+                            implicitWidth: 150 * scaleFactor
+                            implicitHeight: 50 * scaleFactor
+                            border.width: control.activeFocus ? 2 : 1
+                            border.color: "#888"
+                            radius: 5
+                            color: "white"
+                            opacity: loginButton.hovered ? 1 : 0.5
+                        }
+                        label: Text {
+                            text: control.text
+                            color:"#3a3a3a"
+
+                            font.pixelSize: 14 * scaleFactor
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
+
+
+                    onClicked:{
+                        loginBar.visible = true;
+                        if(baseMap.status === 2){
+                            loginBar.visible = false;
+                            loginRec.visible = false;
+                            loginButton.visible = false;
+                        }
+                        else{
+                            loginButton.text = "Försök igen!";
+                        }
+
+                    }
+
+                }
+
+
+            }
 
 
         }//GridLayout
 
 
+
     }
+
 
 
     //Creates a new checkbox for each layer.
     function createCheckBoxes(){
         for(var i in appVisaSkogkulturnaturhansyn_2_0_Map.layers){
-            var margin = 50;
+            var margin = 50 * scaleFactor;
             var checkBoxDef = "import QtQuick 2.4
                                import QtQuick.Controls 1.2
                                import QtQuick.Controls.Styles 1.4
                                    CheckBox{
+                                      id: checkB"+i+"
                                       checked: appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].visible ? true : false;
+
                                       Text{
                                         text: '<b>' + appVisaSkogkulturnaturhansyn_2_0_Map.layers["+i+"].name + '<b>'
-                                        font.pointSize: 15
-                                        anchors{
-                                            left: parent.right
-                                            verticalCenter: parent.verticalCenter
-                                        }
+                                        font.pixelSize: 14 * scaleFactor
+                                        color: '#FFFFFF'
+                                        anchors.centerIn: parent
+                                        wrapMode: Text.WrapAnywhere
+
                                       }
-                                        anchors{
+                                      style: CheckBoxStyle {
+                                            indicator: Rectangle {
+                                                implicitWidth: 250 * scaleFactor
+                                                implicitHeight: 50 * scaleFactor
+                                                radius: 3
+
+                                                border.color: control.activeFocus ? 'darkblue' : 'gray'
+                                                border.width: 1
+                                                Rectangle{
+                                                    visible: control.checked
+                                                    color: '#228e29'
+                                                    border.color: '#333'
+                                                    radius: 1
+                                                    anchors.margins: 4
+                                                    anchors.fill: parent
+                                                }
+                                                Rectangle{
+                                                    visible: !control.checked
+                                                    color: 'grey'
+
+                                                    radius: 1
+                                                    anchors.margins: 4
+                                                    anchors.fill: parent
+                                                }
+                                            }
+                                        }
+                                      anchors{
                                             top: parent.top
-                                            topMargin: "+ (margin + (margin * i))+"
-                                            left: parent.left
-                                            leftMargin: 10
+                                            topMargin: "+ (margin + margin * i)+"
+                                            horizontalCenter: parent.horizontalCenter
+
                                       }
-                                style: CheckBoxStyle {
-                                    indicator: Rectangle {
-                                        implicitWidth: 40
-                                        implicitHeight: 40
-                                        radius: 3
-                                        border.color: control.activeFocus ? 'darkblue' : 'gray'
-                                        border.width: 1
-                                        Rectangle{
-                                            visible: control.checked
-                                            color: '#00572E'
-                                            border.color: '#333'
-                                            radius: 1
-                                            anchors.margins: 4
-                                            anchors.fill: parent
-                                        }
-                                    }
-                                }
+
                                 onCheckedChanged: {
                                     updateVisibility("+i+",checked);
+
+
                                 }
 
 
 
                  }";
 
-            Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
+            var currentBox = Qt.createQmlObject(checkBoxDef, mapServiceRec, 'obj' + i);
+            checkBoxes.push(currentBox);
+
 
 
         }//forloop
@@ -518,7 +767,7 @@ App {
 
     function updateVisibility(layerIndex, visible) {
 
-        appVisaSkogkulturnaturhansyn_2_0_Map.subLayerById(layerIndex).visible = visible;
+        appVisaSkogkulturnaturhansyn_2_0_Map.layers[layerIndex].visible = visible;
         appVisaSkogkulturnaturhansyn_2_0_Map.refresh();
 
     }
