@@ -149,7 +149,7 @@ App {
 
                     }
 
-                    //En dropdownlist, eller ComboBox som det heter i qml
+                    //En dropdownlist, eller ComboBox som det heter i qml och hur man lägger till nya baskartor.
                     //                    Rectangle {
                     //                        anchors {
                     //                            fill: controlsColumn
@@ -605,8 +605,7 @@ App {
                                 var result = identifyResult[index];
                                 var attributeNameDisplayed;
 
-                                console.log("namn: "+appVisaSkogkulturnaturhansyn_2_0_Map.subLayerByName(result.layerName).name);
-                                console.log("visible: "+appVisaSkogkulturnaturhansyn_2_0_Map.subLayerByName(result.layerName).visible);
+
                                 var checkVisLayer = "";
 
                                 for(var attributeIndex in result.feature.attributeNames){
