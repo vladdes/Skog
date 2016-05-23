@@ -91,8 +91,8 @@ App {
                     ArcGISDynamicMapServiceLayer {
                         url: appVisaSkogkulturnaturhansyn_2_0
                         id: appVisaSkogkulturnaturhansyn_2_0_Map
-
                         visible: true
+
                     }
 
 
@@ -149,7 +149,7 @@ App {
 
                     }
 
-                    //En dropdownlist, eller ComboBox som det heter i qml och hur man lägger till nya baskartor.
+                    //A Combobox for addition of entirely new maps or turn on/off current ones.
                     //                    Rectangle {
                     //                        anchors {
                     //                            fill: controlsColumn
@@ -284,7 +284,7 @@ App {
                     //                        }
                     //                    }
 
-                    // Dialog for instructions and error messages
+                    //SettingsButton
                     Rectangle {
                         id: feedbackRectangle
                         anchors {
@@ -299,7 +299,7 @@ App {
                         opacity: feedbackRectangle.activeFocus ? 1 : 0.75
                         Text {
                             id: infoText
-                            text: qsTr("Klicka här för att välja karttjänst eller karta.")
+                            text: qsTr("Knacka här för inställningar.")
                             color: "white"
                             anchors.centerIn: feedbackRectangle
                             font.pixelSize: 12 * scaleFactor
@@ -307,6 +307,58 @@ App {
 
                         }
 
+
+                    }
+                    //identifyDialog, where all the results are shown
+                    Item {
+                        id: identifyDialog
+                        visible: false
+                        anchors.fill: parent
+
+                        Rectangle {
+                            id: dialogRectangle
+                            color: "#31cc3b"
+                            width : parent.width
+                            height: parent.height
+                            anchors.fill: app
+
+                            ListView {
+                                model: fieldsModel
+                                id: fieldsView
+                                //flickableData: elem
+                                anchors.fill: parent
+                                anchors.bottomMargin: 80
+                                contentWidth: parent.width
+                                contentHeight: parent.height
+                                clip: true
+                                delegate: Text {
+                                    text: {
+                                        if(name=== "error")
+                                            text = "Inget objekt hittat!";
+                                        else
+                                            text = name + ": " + value;
+                                    }
+                                    color: "white"
+                                    font.pixelSize: 14 * scaleFactor
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    font.bold: true
+
+                                }
+                            }
+                            Button {
+                                id: infoButton
+                                anchors {
+                                    bottomMargin: 20 * scaleFactor
+                                    horizontalCenter: parent.horizontalCenter
+                                    top: fieldsView.bottom
+
+                                }
+                                text: "<b>OK</b>"
+                                style: loginButton.style
+                                opacity: infoButton.hovered ? 1 : 0.5
+                                onClicked: identifyDialog.visible = false;
+                            }
+                        }
 
                     }
                     // Progress bar
@@ -329,7 +381,7 @@ App {
                         id: flickServices
                         width: parent.width
                         height: parent.height
-                        contentHeight: parent.height*3
+                        contentHeight: 30*50*scaleFactor
                         contentWidth: parent.width
                         visible: false
 
@@ -456,6 +508,7 @@ App {
 
                     }//mapOptionRec
 
+                    //Settings/Options
                     Rectangle{
                         id: optionsRec
                         visible: false
@@ -728,58 +781,8 @@ App {
 
             }//ContentBlock
 
-            // Responsewindow for results
-            Item {
-                id: identifyDialog
-                visible: false
-                width: parent.width
-                height: parent.height
-                Rectangle {
-                    id: dialogRectangle
-                    color: "#31cc3b"
-                    width : parent.width
-                    height: parent.height
-                    anchors.fill: app
 
-                    ListView {
-                        model: fieldsModel
-                        id: fieldsView
-                        //flickableData: elem
-                        anchors.fill: parent
-                        anchors.bottomMargin: 80
-                        contentWidth: parent.width
-                        contentHeight: parent.height
-                        clip: true
-                        delegate: Text {
-                            text: {
-                                if(name=== "error")
-                                    text = "Inget objekt hittat!";
-                                else
-                                    text = name + ": " + value;
-                            }
-                            color: "white"
-                            font.pixelSize: 14 * scaleFactor
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            font.bold: true
 
-                        }
-                    }
-                    Button {
-                        id: infoButton
-                        anchors {
-                            bottomMargin: 10 * scaleFactor
-                            horizontalCenter: parent.horizontalCenter
-                            top: fieldsView.bottom
-
-                        }
-                        text: "<b>OK</b>"
-                        style: loginButton.style
-                        opacity: infoButton.hovered ? 1 : 0.5
-                        onClicked: identifyDialog.visible = false;
-                    }
-                }
-
-            }
         }//GridLayout
 
 
