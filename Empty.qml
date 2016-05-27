@@ -74,6 +74,7 @@ App {
                             margins: 30
                         }
                     }
+                    //preloaded basemaps
                     ArcGISTiledMapServiceLayer {
                         id: baseMap
                         url: "http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
@@ -87,7 +88,7 @@ App {
                         url: skogsTiledMapService
                         visible: false
                     }
-
+                    //preloaded mapservice-layers
                     ArcGISDynamicMapServiceLayer {
                         url: appVisaSkogkulturnaturhansyn_2_0
                         id: appVisaSkogkulturnaturhansyn_2_0_Map
@@ -434,7 +435,7 @@ App {
                                                           checked: mainMap.layerByName('Skogstyrelsens').visible ? true : false;
                                                           visible: parent.visible
                                                           Text{
-                                                            text: '<b> Flygfoto <b>'
+                                                            text: '<b>SkogligaGrunddata<b>'
                                                             font.pixelSize: 14 * scaleFactor
                                                             color: '#FFFFFF'
                                                             anchors.centerIn: parent
@@ -789,12 +790,6 @@ App {
 
     }
 
-    //Creates a new checkBox for each map
-    function createMapCheckBoxes(layerName){
-
-
-
-    }
 
     //Creates a new checkbox for each layer.
     function createCheckBoxes(){
